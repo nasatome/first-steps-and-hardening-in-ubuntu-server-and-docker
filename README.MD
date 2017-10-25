@@ -211,3 +211,27 @@ Review last stable release:
 and change the number version in the command:
 
     curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
+    
+    
+### Check for rootkits
+
+    apt install rkhunter chkrootkit
+    
+test
+
+    chkrootkit
+    
+test 2
+
+    rkhunter --update
+    rkhunter --propupd
+    rkhunter --check
+    
+    
+    
+    
+>todo:
+ 
+* add to cron: check rootkits with mail
+* Tiger and Tripwire
+* https://www.digitalocean.com/community/questions/best-practices-for-hardening-new-sever-in-2017
