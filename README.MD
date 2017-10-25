@@ -1,11 +1,13 @@
 ####Init
-    * dpkg-reconfigure tzdata
-    * dpkg-reconfigure locales
-    * apt update
-    * apt upgrade
-    * apt install -y git vim ufw wget curl
+
+    dpkg-reconfigure tzdata
+    dpkg-reconfigure locales
+    apt update
+    apt upgrade
+    apt install -y git vim ufw wget curl
 
 #### Install BashIt
+
     git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it && ~/.bash_it/install.sh \
     && mkdir -p /root/.bash_it/plugins/enabled/ \
     && ln -s ~/.bash_it/plugins/available/history.plugin.bash ~/.bash_it/plugins/enabled/250---history.plugin.bash \
