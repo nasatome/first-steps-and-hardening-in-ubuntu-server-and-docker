@@ -184,8 +184,10 @@ check
     psad --fw-analyze
     service rsyslog restart
     psad -H
-    psad -R    
+    psad -R   
     
+### Protect/Block TOR IPs 
+https://github.com/nasatome/block_tor_net_by_iptables
 
 ### Install Docker
 Review Script Docker:
@@ -231,7 +233,7 @@ test 2
     
     
 >todo:
- 
+* add https://github.com/nasatome/block_tor_net_by_iptables
 * add to cron: check rootkits with mail
 * Tiger and Tripwire
 * https://www.digitalocean.com/community/questions/best-practices-for-hardening-new-sever-in-2017
