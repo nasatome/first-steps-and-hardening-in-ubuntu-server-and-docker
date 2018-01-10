@@ -85,9 +85,16 @@ in remote host: test
     ssh-add -L
     ssh -T git@github.com
     
-#### Firewall UFW
+#### Firewall UFW And IPTABLES
 
     ufw allow 4449 && ufw allow http && ufw allow https && ufw default deny incoming && ufw enable && ufw logging on
+    
+    iptables -A INPUT -j LOG \
+    && iptables -A FORWARD -j LOG \
+    && ip6tables -A INPUT -j LOG \
+    && ip6tables -A FORWARD -j LOG
+    
+    apt install iptables-persistent 
 
 #### Network Hardening
 
@@ -170,10 +177,7 @@ psad
     && sed -i 's/AUTO_IDS_DANGER_LEVEL       5;/AUTO_IDS_DANGER_LEVEL       1;/' /etc/psad/psad.conf \
     && sed -i 's#IPT_SYSLOG_FILE             /var/log/messages;#IPT_SYSLOG_FILE             /var/log/syslog;#' /etc/psad/psad.conf
     
-    iptables -A INPUT -j LOG \
-    && iptables -A FORWARD -j LOG \
-    && ip6tables -A INPUT -j LOG \
-    && ip6tables -A FORWARD -j LOG
+
 
 update
     
