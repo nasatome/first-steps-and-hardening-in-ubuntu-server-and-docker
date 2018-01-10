@@ -85,16 +85,18 @@ in remote host: test
     ssh-add -L
     ssh -T git@github.com
     
-#### Firewall UFW And IPTABLES
+#### Firewall UFW And IPTABLES Persistent
 
     ufw allow 4449 && ufw allow http && ufw allow https && ufw default deny incoming && ufw enable && ufw logging on
+      
+    apt install iptables-persistent 
     
     iptables -A INPUT -j LOG \
     && iptables -A FORWARD -j LOG \
     && ip6tables -A INPUT -j LOG \
     && ip6tables -A FORWARD -j LOG
     
-    apt install iptables-persistent 
+    netfilter-persistent save
 
 #### Network Hardening
 
@@ -123,8 +125,9 @@ now
     
 now 
 
-    sed -i 's/destemail = root@localhost/destemail = nasatome@YOURDOMAIN.com/' /etc/fail2ban/jail.conf \
-    && sed -i 's/sender = root@localhost/sender = root@host.vps.ovh.ca/' /etc/fail2ban/jail.conf \
+    
+    sed -i 's/destemail = root@localhost/destemail = MAIL@YOURMAIL.COM/' /etc/fail2ban/jail.conf \
+    && sed -i 's/sender = root@localhost/sender = root@YOURSERVERDOMAIN.COM/' /etc/fail2ban/jail.conf \
     && sed -i 's/action = %(action_)s/action = %(action_mwl)s/' /etc/fail2ban/jail.conf \
     && echo "[nginx-http-auth]" > /etc/fail2ban/jail.local \
     && echo "enabled  = false" >> /etc/fail2ban/jail.local \
@@ -167,26 +170,31 @@ restart
 
 psad
     
-    sed -i 's/EMAIL_ADDRESSES             root@localhost;/EMAIL_ADDRESSES             nasatome@YOURDOMAIN.com;/' /etc/psad/psad.conf \
-    && sed -i 's/HOSTNAME                    _CHANGEME_;/HOSTNAME                    OVH_1;/' /etc/psad/psad.conf \
+    sed -i 's/EMAIL_ADDRESSES             root@localhost;/EMAIL_ADDRESSES             EMAIL@YOUREMAIL.COM;/' /etc/psad/psad.conf \
+    && sed -i 's/HOSTNAME                    _CHANGEME_;/HOSTNAME                    SERVER_NAME_TO_CHANGE;/' /etc/psad/psad.conf \
     && sed -i 's/ENABLE_AUTO_IDS             N;/ENABLE_AUTO_IDS             Y;/' /etc/psad/psad.conf \
     && sed -i 's/DANGER_LEVEL2               15;/DANGER_LEVEL2               15;/' /etc/psad/psad.conf \
     && sed -i 's/DANGER_LEVEL3               150;/DANGER_LEVEL3               30;/' /etc/psad/psad.conf \
     && sed -i 's/DANGER_LEVEL4               1500;/DANGER_LEVEL4               100;/' /etc/psad/psad.conf \
     && sed -i 's/DANGER_LEVEL5               10000;/DANGER_LEVEL5               300;/' /etc/psad/psad.conf \
+    && sed -i 's/EMAIL_ALERT_DANGER_LEVEL    1;/EMAIL_ALERT_DANGER_LEVEL    5;/' /etc/psad/psad.conf \
+    && sed -i 's/EMAIL_LIMIT                 0;/EMAIL_LIMIT                 1;/' /etc/psad/psad.conf \
+    && sed -i 's/EMAIL_LIMIT_STATUS_MSG      Y;/EMAIL_LIMIT_STATUS_MSG      N;/' /etc/psad/psad.conf \
+    && sed -i 's/ENABLE_AUTO_IDS_EMAILS      Y;/ENABLE_AUTO_IDS_EMAILS      N;/' /etc/psad/psad.conf \
     && sed -i 's/AUTO_IDS_DANGER_LEVEL       5;/AUTO_IDS_DANGER_LEVEL       1;/' /etc/psad/psad.conf \
     && sed -i 's#IPT_SYSLOG_FILE             /var/log/messages;#IPT_SYSLOG_FILE             /var/log/syslog;#' /etc/psad/psad.conf
     
 
-
 update
     
     psad --sig-update 
+    
+   
 
 check
-    
-    psad --fw-analyze
+
     service rsyslog restart
+    psad --fw-analyze
     psad -H
     psad -R   
     
@@ -216,7 +224,7 @@ Review last stable release:
 > https://github.com/docker/compose/releases
 and change the number version in the command:
 
-    curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
+    curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
     
     
 ### Check for rootkits
