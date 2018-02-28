@@ -16,6 +16,18 @@
     && sed -i 's/bobby/sexy/' ~/.bashrc
     
     > You can change the last line "sexy" by any of the available themes, exit the console and re-enter to apply https://github.com/Bash-it/bash-it/tree/master/themes
+    
+#### Unattended Upgrades
+> (Change "YOUREMAIL@TOCHANGE.COM")
+
+> the second command it's an interactive dialog (respond YES and OK) which will create /etc/apt/apt.conf.d/20auto-upgrades 
+    
+    apt install update-notifier-common && \
+    dpkg-reconfigure --priority=low unattended-upgrades && \
+    sed -i 's#//Unattended-Upgrade::Mail "root";#Unattended-Upgrade::Mail "YOUREMAIL@TOCHANGE.COM";#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
+    sed -i 's#//Unattended-Upgrade::MailOnlyOnError#Unattended-Upgrade::MailOnlyOnError#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
+    sed -i 's#//Unattended-Upgrade::Automatic-Reboot "false";#Unattended-Upgrade::Automatic-Reboot "true";#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
+    sed -i 's#//Unattended-Upgrade::Automatic-Reboot-Time "02:00";#Unattended-Upgrade::Automatic-Reboot-Time "04:00";#' /etc/apt/apt.conf.d/50unattended-upgrades
 
 #### Hardening SSH
 > (Change "YOURUSERNAME")
