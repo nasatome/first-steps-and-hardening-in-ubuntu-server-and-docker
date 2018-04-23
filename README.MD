@@ -15,7 +15,7 @@
     && ln -s ~/.bash_it/plugins/available/history.plugin.bash ~/.bash_it/plugins/enabled/250---history.plugin.bash \
     && sed -i 's/bobby/sexy/' ~/.bashrc
     
-    > You can change the last line "sexy" by any of the available themes, exit the console and re-enter to apply https://github.com/Bash-it/bash-it/tree/master/themes
+> You can change the last line "sexy" by any of the available themes, exit the console and re-enter to apply https://github.com/Bash-it/bash-it/tree/master/themes
     
 #### Unattended Upgrades
 > (Change "YOUREMAIL@TOCHANGE.COM")
@@ -251,7 +251,7 @@
 > https://github.com/docker/compose/releases
 > and change the number version in the command:
 
-    curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
+    curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
     
     
 ### Check for rootkits
