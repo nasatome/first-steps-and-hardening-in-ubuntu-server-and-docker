@@ -235,6 +235,8 @@
 > And Exec
 
     curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+> (for ubuntu 18.04 in not production mode:  today there are still no stable packages 2018-05-06)   
+    curl -fsSL test.docker.com -o get-docker.sh && sh get-docker.sh 
     
 > Can verify
     
@@ -251,7 +253,7 @@
 > https://github.com/docker/compose/releases
 > and change the number version in the command:
 
-    curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
+    curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
     
     
 ### Check for rootkits
