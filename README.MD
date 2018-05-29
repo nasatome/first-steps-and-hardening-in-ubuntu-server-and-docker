@@ -8,7 +8,7 @@
     apt upgrade
     apt install -y git vim ufw wget curl
 
-#### Install BashIt
+#### Install BashIt (only if you do not use zsh or some similar)
 
     git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it && ~/.bash_it/install.sh \
     && mkdir -p ~/.bash_it/plugins/enabled/ \
