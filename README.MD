@@ -2,10 +2,10 @@
 
 #### Init
 
-    dpkg-reconfigure tzdata
-    dpkg-reconfigure locales
-    apt update
-    apt upgrade
+    dpkg-reconfigure tzdata && \
+    dpkg-reconfigure locales  && \
+    apt update  && \
+    apt upgrade -y && \
     apt install -y git vim ufw wget curl
 
 #### Install BashIt (only if you do not use zsh or some similar)
@@ -95,9 +95,11 @@
     <<ForwardAgent yes
     <<-----------------------
 
+> And test conection in other terminal
 
+    ssh -p 4449 YOUR_USER@YOUR_IP_OR_DOMAIN_DNS
 
-> In remote host (Server): exec this commands
+> Now In remote host (Server): exec this commands
 
     sudo -E su root
     echo "$SSH_AUTH_SOCK"
@@ -235,7 +237,7 @@
 > And Exec
 
     curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
-> (for ubuntu 18.04 in not production mode:  today there are still no stable packages 2018-05-06)   
+> (for not production mode)   
     curl -fsSL test.docker.com -o get-docker.sh && sh get-docker.sh 
     
 > Can verify
