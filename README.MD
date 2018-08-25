@@ -45,7 +45,7 @@
 
 > In Remote Machine Paste Output in:
 > (Start Session as a New User Created)
-
+    ROOT $: su YOURUSERNAME
     YOURUSERNAME $: mkdir ~/.ssh
     YOURUSERNAME $: chmod 700 ~/.ssh
     YOURUSERNAME $: vim ~/.ssh/authorized_keys
