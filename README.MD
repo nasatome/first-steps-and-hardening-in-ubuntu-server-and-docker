@@ -64,6 +64,7 @@
 
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak \
     && sed -i 's/Port 22/Port 4449/' /etc/ssh/sshd_config \
+    && sed -i 's/#Port 4449/Port 4449/' /etc/ssh/sshd_config \
     && sed -i 's/X11Forwarding yes/X11Forwarding no/' /etc/ssh/sshd_config \
     && sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
     && sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config \
