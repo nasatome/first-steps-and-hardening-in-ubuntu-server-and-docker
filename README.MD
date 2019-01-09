@@ -115,6 +115,28 @@
 > Remember that you must add your SSH key to your GITHUB account
 
    `https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/`
+   
+#### Firewalld
+    firewalld.org
+For Ubuntu 18.04, it seems firewalld has become the default where ufw is installed but inactive.
+```
+    root@localhost:~# firewall-cmd --state 
+    running
+    root@localhost:~# ufw status
+    Status: inactive
+```
+    firewall-cmd --permanent --zone=public --add-service={http,https}
+    firewall-cmd --permanent --zone=public --add-port=4449/tcp
+    firewall-cmd --permanent --zone=public --remove-service=ssh --permanent
+    
+    firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -j LOG && \
+    firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -j LOG && \
+    firewall-cmd --permanent --direct --add-rule ipv6 filter INPUT 0 -j LOG && \
+    firewall-cmd --permanent --direct --add-rule ipv6 filter FORWARD 0 -j LOG
+    
+The `firewall-cmd –reload` command is necessary to activate the change. Contrary to the `–complete-reload` option, current connections are not stopped.
+More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
+
 
 #### Firewall UFW And IPTABLES Persistent
 
