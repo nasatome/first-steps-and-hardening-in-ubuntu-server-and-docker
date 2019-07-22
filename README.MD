@@ -38,7 +38,20 @@ For example:
      export MY_SERVER_DOMAIN="mydomain.com";
      export MY_SERVER_EMAIL_FROM="root@mydomain.com";
      export MY_SERVER_SSH_PORT="4444"
+     
+And in your **local machine** in the file `~/.bashrc`: 
+copy and paste the following (change for your data):
+  
+    export GIT_COMMITTER_NAME='John Connor'
+    export GIT_COMMITTER_EMAIL='john@gmail.com'
+    export GIT_AUTHOR_NAME='John Connor'
+    export GIT_AUTHOR_EMAIL='john@gmail.com'
  
+You can open it with `vim ~/.bashrc` or with your favorite graphical text editor,
+
+If you installed BashIt on your local machine, you can install it after the line. `#export GIT_HOSTING='git@git.domain.com'`
+
+
 #### Unattended Upgrades
 Security updates are very important on any server.
 
