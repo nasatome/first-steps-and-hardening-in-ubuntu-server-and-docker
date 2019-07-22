@@ -3,6 +3,14 @@
 Tested on Digital Ocean; Ubuntu versions 16.04 and 18.04
 (So all instructions are executed as ROOT)
 
+Example In Local Computer: 
+
+[![Commands on local computer](https://asciinema.org/a/jQTQG2bfsRZtN1zwHvgbnP7aL.svg)](https://asciinema.org/a/jQTQG2bfsRZtN1zwHvgbnP7aL)
+
+
+Example In Remote Server:
+**SOON**
+
 
 ###### Start with this
 First of all configure your timezone and your encodings, this command will also install some utilities
