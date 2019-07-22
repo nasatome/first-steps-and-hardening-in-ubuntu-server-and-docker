@@ -35,17 +35,21 @@ First of all configure your timezone and your encodings, this command will also 
 
 It is important that you change these environment variables, with your personal data in Server
 
-    export MY_USERNAME="USERNAMETOCHANGE";
-    export MY_EMAIL="YOUREMAIL@DOMAINTOCHANGE.COM";
-    export MY_SERVER_DOMAIN="DOMAINTOCHANGE.COM";
-    export MY_SERVER_EMAIL_FROM="root@DOMAINTOCHANGE.COM";
+    export MY_USERNAME="USERNAMETOCHANGE"; \
+    export MY_EMAIL="YOUREMAIL@DOMAINTOCHANGE.COM"; \
+    export MY_SERVER_DOMAIN="DOMAINTOCHANGE.COM"; \
+    export MY_SERVER_EMAIL_FROM="root@DOMAINTOCHANGE.COM"; \
     export MY_SERVER_SSH_PORT="4444"
 For example:
 >    export MY_USERNAME="nasatome";
-     export MY_EMAIL="nasatome@mydomain.com";
-     export MY_SERVER_DOMAIN="mydomain.com";
-     export MY_SERVER_EMAIL_FROM="root@mydomain.com";
-     export MY_SERVER_SSH_PORT="4444"
+
+>    export MY_EMAIL="nasatome@mydomain.com";
+
+>    export MY_SERVER_DOMAIN="mydomain.com";
+
+>    export MY_SERVER_EMAIL_FROM="root@mydomain.com";
+
+>    export MY_SERVER_SSH_PORT="4444"
      
 And in your **local machine** in the file `~/.bashrc`: 
 copy and paste the following (change for your data):
