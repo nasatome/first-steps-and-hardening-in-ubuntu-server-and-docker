@@ -1,14 +1,20 @@
-# First Steps in Ubuntu Server 16.04 / Hardening and Config With Docker
+# First Steps in Ubuntu Server / Hardening and Config With Docker
 
-#### Init
+Tested on Digital Ocean; Ubuntu versions 16.04 and 18.04
+(So all instructions are executed as ROOT)
+
+
+###### Start with this
+First of all configure your timezone and your encodings, this command will also install some utilities
 
     dpkg-reconfigure tzdata && \
     dpkg-reconfigure locales  && \
-    apt update  && \
-    apt upgrade -y && \
-    apt install -y git vim ufw wget curl
+    apt-get update  && \
+    apt-get upgrade -y && \
+    apt-get install -y git vim wget curl
 
-#### Install BashIt (only if you do not use zsh or some similar)
+
+###### Install BashIt (Only if you do not use zsh or some similar console)
 
     git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it && ~/.bash_it/install.sh \
     && mkdir -p ~/.bash_it/plugins/enabled/ \
@@ -17,54 +23,106 @@
     
 > You can change the last line "sexy" by any of the available themes, exit the console and re-enter to apply https://github.com/Bash-it/bash-it/tree/master/themes
     
+###### Environments
+
+It is important that you change these environment variables, with your personal data
+
+    export MY_USERNAME="USERNAMETOCHANGE"
+    export MY_EMAIL="YOUREMAIL@DOMAINTOCHANGE.COM"
+    export MY_SERVER_DOMAIN="DOMAINTOCHANGE.COM"
+    export MY_SERVER_EMAIL_FROM="root@DOMAINTOCHANGE.COM"
+    export MY_SERVER_SSH_PORT="4444"
+For example:
+>    export MY_USERNAME="nasatome";
+     export MY_EMAIL="nasatome@mydomain.com";
+     export MY_SERVER_DOMAIN="mydomain.com";
+     export MY_SERVER_EMAIL_FROM="root@mydomain.com"
+ 
 #### Unattended Upgrades
-> (Change "YOUREMAIL@TOCHANGE.COM")
+Security updates are very important on any server.
 
 > the second command it's an interactive dialog (respond YES and OK) which will create /etc/apt/apt.conf.d/20auto-upgrades 
     
-    apt install update-notifier-common && \
+    apt-get install -y unattended-upgrades update-notifier-common && \
     dpkg-reconfigure --priority=low unattended-upgrades && \
-    sed -i 's#//Unattended-Upgrade::Mail "root";#Unattended-Upgrade::Mail "YOUREMAIL@TOCHANGE.COM";#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
+    sed -i 's#//Unattended-Upgrade::Mail "root";#Unattended-Upgrade::Mail "'$MY_EMAIL'";#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
     sed -i 's#//Unattended-Upgrade::MailOnlyOnError#Unattended-Upgrade::MailOnlyOnError#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
     sed -i 's#//Unattended-Upgrade::Automatic-Reboot "false";#Unattended-Upgrade::Automatic-Reboot "true";#' /etc/apt/apt.conf.d/50unattended-upgrades &&\
     sed -i 's#//Unattended-Upgrade::Automatic-Reboot-Time "02:00";#Unattended-Upgrade::Automatic-Reboot-Time "04:00";#' /etc/apt/apt.conf.d/50unattended-upgrades
 
+If you only want to install packages from security sources, run this command:
+
+    sed -i 's#        "${distro_id}:${distro_codename}";#//      "${distro_id}:${distro_codename}";#' /etc/apt/apt.conf.d/50unattended-upgrades
+> this will depend on the level of stability you want in your packages
+
+
 #### Hardening SSH
-> (Change "YOURUSERNAME")
 
-    ssh-keygen -A
-    --
-    adduser YOURUSERNAME \
-    && usermod -aG sudo YOURUSERNAME
+Now, we will generate new host keys, as well as a new user and add it to the group of administration privileges.
 
-> In Your Local Machine:
+> In your remote machine
 
-    ssh-keygen -t ed25519
-    ssh-add ~/.ssh/id_ed25519
-    cat ~/.ssh/id_ed25519.pub
+    ssh-keygen -A && \
+    adduser $MY_USERNAME && \
+    usermod -aG sudo $MY_USERNAME
 
-> In Remote Machine Paste Output in:
-> (Start Session as a New User Created)
+> In your Local Machine (Laptop o PC With Linux):
+
+[Why ed25519](https://medium.com/risan/upgrade-your-ssh-key-to-ed25519-c6e8d60d3c54)
     
-    ROOT $: su YOURUSERNAME
-    YOURUSERNAME $: mkdir ~/.ssh
-    YOURUSERNAME $: chmod 700 ~/.ssh
-    YOURUSERNAME $: vim ~/.ssh/authorized_keys
-    YOURUSERNAME $: chmod 600 ~/.ssh/authorized_keys
+![](.README.MD_images/why_ed25519.png)
     
-    Example to paste: ssh-ed25519 AAAAC3Nzavrg545t64t34rferfdrferodwEv1MMI2+Nh9QxpgrNxb2Is1Cc6 YOURUSERNAME
+Now we will create the new key  
+```
+ssh-keygen -t ed25519
+```
+we proceed to add it to the key ring
+```
+ssh-add ~/.ssh/id_ed25519
+```
+and we get a public key
+```
+cat ~/.ssh/id_ed25519.pub
+```
 
-> Exit console and reconect....
+> Now In Remote Machine 
 
-> Test root login:
+Paste Output in `~/.ssh/authorized_keys` with the following commands:
+
+from your terminal in root change user
+
+    ROOT #: su $MY_USERNAME
+Now create a new folder in case it doesn't exist
+
+    MY_USERNAME $: mkdir ~/.ssh
+Now let's change the permissions of the folder, only the owner can modify it
+    
+    MY_USERNAME $: chmod 700 ~/.ssh
+Now we will create the file where the public key that we obtained previously will be copied.
+    
+    MY_USERNAME $: vim ~/.ssh/authorized_keys
+
+>To use VIM, once inside vim, press the "Ins or Insert" key on your keyboard, until at the bottom right you see a legend that says "-- INSERT --" then paste the contents of the public key you got from your local machine, which you could see when you executed the command "cat ~/.ssh/id_ed25519.pub" above, once the string is pasted, press the ESC key then press the ":" key and then press the "wq" keys visually you should see something like ":wq" which means you can save the file and then exit vim
+
+Now we will change to the correct permissions to the file that has just been created    
+
+    MY_USERNAME $: chmod 600 ~/.ssh/authorized_keys
+    
+>Example to paste: ssh-ed25519 AAAAC3Nzavrg545t64t34rferfdrferodwEv1MMI2+Nh9QxpgrNxb2Is1Cc6 YOURUSERNAME
+
+Now... Open New Console in your local machine and reconect...
+
+    ssh YOUR_USER@YOUR_IP_OR_DOMAIN_DNS
+
+And... once connected with your user test that you can upload your privileges to root
 
     YOURUSERNAME $: sudo -E su root
 
 > Now exec this command in root mode (after executing -> sudo -E su root):
 
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak \
-    && sed -i 's/Port 22/Port 4449/' /etc/ssh/sshd_config \
-    && sed -i 's/#Port 4449/Port 4449/' /etc/ssh/sshd_config \
+    && sed -i 's/Port 22/Port '$MY_SERVER_SSH_PORT'/' /etc/ssh/sshd_config \
+    && sed -i 's/#Port '$MY_SERVER_SSH_PORT'/Port '$MY_SERVER_SSH_PORT'/' /etc/ssh/sshd_config \
     && sed -i 's/X11Forwarding yes/X11Forwarding no/' /etc/ssh/sshd_config \
     && sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
     && sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config \
@@ -99,7 +157,7 @@
 
 > And test conection in other terminal
 
-    ssh -p 4449 YOUR_USER@YOUR_IP_OR_DOMAIN_DNS
+    ssh -p $MY_SERVER_SSH_PORT YOUR_USER@YOUR_IP_OR_DOMAIN_DNS
 
 > Now In remote host (Server): exec this commands
 
@@ -139,10 +197,17 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
 
 
 #### Firewall UFW And IPTABLES Persistent
+1
 
+    apt-get install -y ufw
+
+2
+    
     ufw allow 4449 && ufw allow http && ufw allow https && ufw default deny incoming && ufw enable && ufw logging on
+    
+    
       
-    apt install iptables-persistent 
+    apt-get install iptables-persistent 
     
     iptables -A INPUT -j LOG \
     && iptables -A FORWARD -j LOG \
@@ -174,7 +239,7 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     
 #### Fail2Ban and PSAD
 
-    apt install -y fail2ban psad
+    apt-get install -y fail2ban psad
     
 > Now exec (Change MAIL@YOURMAIL.COM and root@YOURSERVERDOMAIN.COM)
 
@@ -285,7 +350,7 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     
 ### Check for rootkits
 
-    apt install rkhunter chkrootkit
+    apt-get install rkhunter chkrootkit
     
 > test
 
