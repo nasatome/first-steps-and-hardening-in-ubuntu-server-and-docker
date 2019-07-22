@@ -25,7 +25,7 @@ First of all configure your timezone and your encodings, this command will also 
     
 ###### Environments
 
-It is important that you change these environment variables, with your personal data
+It is important that you change these environment variables, with your personal data in Server
 
     export MY_USERNAME="USERNAMETOCHANGE"
     export MY_EMAIL="YOUREMAIL@DOMAINTOCHANGE.COM"
@@ -37,6 +37,7 @@ For example:
      export MY_EMAIL="nasatome@mydomain.com";
      export MY_SERVER_DOMAIN="mydomain.com";
      export MY_SERVER_EMAIL_FROM="root@mydomain.com"
+     export MY_SERVER_SSH_PORT="4444"
  
 #### Unattended Upgrades
 Security updates are very important on any server.
@@ -60,13 +61,13 @@ If you only want to install packages from security sources, run this command:
 
 Now, we will generate new host keys, as well as a new user and add it to the group of administration privileges.
 
-> In your remote machine
+> In your **remote machine**
 
     ssh-keygen -A && \
     adduser $MY_USERNAME && \
     usermod -aG sudo $MY_USERNAME
 
-> In your Local Machine (Laptop o PC With Linux):
+> In your **Local Machine** (Laptop o PC With Linux):
 
 [Why ed25519](https://medium.com/risan/upgrade-your-ssh-key-to-ed25519-c6e8d60d3c54)
     
@@ -85,9 +86,10 @@ and we get a public key
 cat ~/.ssh/id_ed25519.pub
 ```
 
-> Now In Remote Machine 
+> Now In **Remote Machine**
 
-Paste Output in `~/.ssh/authorized_keys` with the following commands:
+Paste Output in `~/.ssh/authorized_keys` with the following commands 
+(Remember to copy and paste only the part of the command and not the part of the username):
 
 from your terminal in root change user
 
@@ -110,11 +112,11 @@ Now we will change to the correct permissions to the file that has just been cre
     
 >Example to paste: ssh-ed25519 AAAAC3Nzavrg545t64t34rferfdrferodwEv1MMI2+Nh9QxpgrNxb2Is1Cc6 YOURUSERNAME
 
-Now... Open New Console in your local machine and reconect...
+Now... Open New Console in your **local machine** and reconect...
 
     ssh YOUR_USER@YOUR_IP_OR_DOMAIN_DNS
 
-And... once connected with your user test that you can upload your privileges to root
+And... once connected with your user test that you can upgrade your privileges to root
 
     YOURUSERNAME $: sudo -E su root
 
@@ -124,6 +126,7 @@ And... once connected with your user test that you can upload your privileges to
     && sed -i 's/Port 22/Port '$MY_SERVER_SSH_PORT'/' /etc/ssh/sshd_config \
     && sed -i 's/#Port '$MY_SERVER_SSH_PORT'/Port '$MY_SERVER_SSH_PORT'/' /etc/ssh/sshd_config \
     && sed -i 's/X11Forwarding yes/X11Forwarding no/' /etc/ssh/sshd_config \
+    && sed -i 's/AcceptEnv LANG LC_*/AcceptEnv LANG LC_* GIT_*/' /etc/ssh/sshd_config \
     && sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
     && sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config \
     && sed -zi 's/DebianBanner yes\|$/DebianBanner no\n/' /etc/ssh/sshd_config \
@@ -131,60 +134,81 @@ And... once connected with your user test that you can upload your privileges to
     && sed -zi 's/ClientAliveCountMax 600\|$/ClientAliveCountMax 600\n/' /etc/ssh/sshd_config \
     && sed -zi 's/AllowAgentForwarding no\|$/AllowAgentForwarding yes/' /etc/ssh/sshd_config
 
+
+
 > And now reload ssh service
 
     systemctl reload sshd
 
- > To avoid disconnections *In local machine*
+ > **In local machine** To avoid disconnections exec
     
     echo "Host *" >> ~/.ssh/config
+    echo "SendEnv LANG LC_* GIT_*" >> ~/.ssh/config
     echo "ServerAliveInterval 60" >> ~/.ssh/config
     echo "ServerAliveCountMax 600" >> ~/.ssh/config
     echo "ForwardAgent yes" >> ~/.ssh/config
 
-> And test:
+> And now test:
 
     cat ~/.ssh/config
     
 > You should see this exit
 
-    <<-----------------------
-    <<Host *
-    <<ServerAliveInterval 60
-    <<ServerAliveCountMax 600
-    <<ForwardAgent yes
-    <<-----------------------
+    <<---------~/.ssh/config--------------
+    Host *
+    SendEnv LANG LC_* GIT_*
+    ServerAliveInterval 60
+    ServerAliveCountMax 600
+    ForwardAgent yes
+    <<------------------------------------
+    
+    
+> Apart from the global and repository configuration settings, Git reads the environment variables GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL, GIT_COMMITTER_NAME and GIT_COMMITTER_EMAIL. The idea now is to set them on your machine and take them via SSH on every single machine.
+Local setup
 
-> And test conection in other terminal
+> At first you need to set the variables in your .bashrc file:
 
-    ssh -p $MY_SERVER_SSH_PORT YOUR_USER@YOUR_IP_OR_DOMAIN_DNS
+> And now test connection in other **local machine** terminal 
 
-> Now In remote host (Server): exec this commands
+> (Don't forget to change the 4444 to the port you have assigned in your SSH environment variable in remote 7server)
+
+    ssh -p 4444 USERNAMETOCHANGE@YOUR_IP_OR_DOMAIN_DNS
+
+Now In **remote server**): exec this commands
 
     sudo -E su root
+
+and one of these commands 
+
     echo "$SSH_AUTH_SOCK"
     ssh-add -L
     ssh -T git@github.com
 
-> Everyone should give you positive outcomes
+> Everyone should give you positive outcomes; for example github command response:
 
-```Hi YOURGITUSERNAME! You've successfully authenticated, but GitHub does not provide shell access.```
+```
+Hi YOURGITUSERNAME! You've successfully authenticated, but GitHub does not provide shell access.
+```
 
 > Remember that you must add your SSH key to your GITHUB account
 
    `https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/`
    
-#### Firewalld
+###### Over Firewalld
     firewalld.org
-For Ubuntu 18.04, it seems firewalld has become the default where ufw is installed but inactive.
+For Ubuntu 18.04 in other VPS Providers, it seems firewalld has become the default where ufw is installed but inactive.
+if you execute the following commands you can check if ufw is active
+
 ```
     root@localhost:~# firewall-cmd --state 
     running
     root@localhost:~# ufw status
     Status: inactive
 ```
+If this is your case, then these commands can be useful. (otherwise, skip this section)
+
     firewall-cmd --permanent --zone=public --add-service={http,https}
-    firewall-cmd --permanent --zone=public --add-port=4449/tcp
+    firewall-cmd --permanent --zone=public --add-port=$MY_SERVER_SSH_PORT/tcp
     firewall-cmd --permanent --zone=public --remove-service=ssh --permanent
     
     firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -j LOG && \
@@ -197,26 +221,27 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
 
 
 #### Firewall UFW And IPTABLES Persistent
-1
 
+Install ufw
+    
     apt-get install -y ufw
+ 
+ Disable incoming ports
+    
+    ufw allow $MY_SERVER_SSH_PORT && ufw allow http && ufw allow https && ufw default deny incoming && ufw enable && ufw logging on
+ 
+Install iptables-persistent
 
-2
-    
-    ufw allow 4449 && ufw allow http && ufw allow https && ufw default deny incoming && ufw enable && ufw logging on
-    
-    
-      
     apt-get install iptables-persistent 
-    
+
+Enable Logs of iptables   
+
     iptables -A INPUT -j LOG \
     && iptables -A FORWARD -j LOG \
     && ip6tables -A INPUT -j LOG \
     && ip6tables -A FORWARD -j LOG
-    
-    netfilter-persistent save
 
-#### Network Hardening
+###### Network Hardening
 
     sed -i 's/#net.ipv4.conf.default.rp_filter=1/net.ipv4.conf.default.rp_filter=1/' /etc/sysctl.conf \
     && sed -i 's/#net.ipv4.conf.all.rp_filter=1/net.ipv4.conf.all.rp_filter=1/' /etc/sysctl.conf \
@@ -228,23 +253,24 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     && sed -i 's/#net.ipv4.conf.all.accept_redirects = 0/net.ipv4.conf.all.accept_redirects = 0/' /etc/sysctl.conf \
     && sed -i 's/#net.ipv6.conf.all.accept_redirects = 0/net.ipv6.conf.all.accept_redirects = 0/' /etc/sysctl.conf
     
-> Reload With
+Now Reload With
 
     sysctl -p
     
-> Now
+And Now
 
-    sed -i 's/order hosts,bind/order bind,hosts/' /etc/host.conf \
-    && sed -i 's/multi on/nospoof on/' /etc/host.conf
+    sed -i 's/order hosts,bind/order bind,hosts/' /etc/host.conf
     
 #### Fail2Ban and PSAD
 
+Now Install
+
     apt-get install -y fail2ban psad
     
-> Now exec (Change MAIL@YOURMAIL.COM and root@YOURSERVERDOMAIN.COM)
+And exec
 
-    sed -i 's/destemail = root@localhost/destemail = MAIL@YOURMAIL.COM/' /etc/fail2ban/jail.conf \
-    && sed -i 's/sender = root@localhost/sender = root@YOURSERVERDOMAIN.COM/' /etc/fail2ban/jail.conf \
+    sed -i 's/destemail = root@localhost/destemail = '$MY_EMAIL'/' /etc/fail2ban/jail.conf \
+    && sed -i 's/sender = root@localhost/sender = '$MY_SERVER_EMAIL_FROM'/' /etc/fail2ban/jail.conf \
     && sed -i 's/action = %(action_)s/action = %(action_mwl)s/' /etc/fail2ban/jail.conf \
     && echo "[nginx-http-auth]" > /etc/fail2ban/jail.local \
     && echo "enabled  = false" >> /etc/fail2ban/jail.local \
@@ -263,14 +289,14 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     && echo "" >> /etc/fail2ban/jail.local \
     && echo "[ssh]" >> /etc/fail2ban/jail.local \
     && echo "enabled = true" >> /etc/fail2ban/jail.local \
-    && echo "port    = 4449" >> /etc/fail2ban/jail.local \
+    && echo "port    = $MY_SERVER_SSH_PORT" >> /etc/fail2ban/jail.local \
     && echo "filter  = sshd" >> /etc/fail2ban/jail.local \
     && echo "logpath = /var/log/auth.log" >> /etc/fail2ban/jail.local \
     && echo "maxretry = 4" >> /etc/fail2ban/jail.local \
     && echo "" >> /etc/fail2ban/jail.local \
     && echo "[ssh-ddos]" >> /etc/fail2ban/jail.local \
     && echo "enabled = true" >> /etc/fail2ban/jail.local \
-    && echo "port    = 4449" >> /etc/fail2ban/jail.local \
+    && echo "port    = $MY_SERVER_SSH_PORT" >> /etc/fail2ban/jail.local \
     && echo "filter  = sshd-ddos" >> /etc/fail2ban/jail.local \
     && echo "logpath = /var/log/auth.log" >> /etc/fail2ban/jail.local \
     && echo "" >> /etc/fail2ban/jail.local \
@@ -285,10 +311,10 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     
     systemctl restart fail2ban
 
-> For psad ( Change: EMAIL@YOUREMAILTOCHANGE.COM and SERVER_NAME_TO_CHANGE)
+> For psad config
     
-    sed -i 's/EMAIL_ADDRESSES             root@localhost;/EMAIL_ADDRESSES             EMAIL@YOUREMAILTOCHANGE.COM;/' /etc/psad/psad.conf \
-    && sed -i 's/HOSTNAME                    _CHANGEME_;/HOSTNAME                    SERVER_NAME_TO_CHANGE;/' /etc/psad/psad.conf \
+    sed -i 's/EMAIL_ADDRESSES             root@localhost;/EMAIL_ADDRESSES             '$MY_EMAIL';/' /etc/psad/psad.conf \
+    && sed -i 's/HOSTNAME                    _CHANGEME_;/HOSTNAME                    '$MY_SERVER_DOMAIN';/' /etc/psad/psad.conf \
     && sed -i 's/ENABLE_AUTO_IDS             N;/ENABLE_AUTO_IDS             Y;/' /etc/psad/psad.conf \
     && sed -i 's/DANGER_LEVEL2               15;/DANGER_LEVEL2               15;/' /etc/psad/psad.conf \
     && sed -i 's/DANGER_LEVEL3               150;/DANGER_LEVEL3               30;/' /etc/psad/psad.conf \
@@ -302,34 +328,45 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     && sed -i 's#IPT_SYSLOG_FILE             /var/log/messages;#IPT_SYSLOG_FILE             /var/log/syslog;#' /etc/psad/psad.conf
     
 
-> Now Update
+Now Update
     
     psad --sig-update 
     
-> Check
+And Check
 
     service rsyslog restart
+
+In the following command, all outputs with a + sign must appear
     psad --fw-analyze
+
+Now you can restart the service with any of these commands
     psad -H
     psad -R   
     
-### Protect/Block TOR IPs 
+###### Protect/Block TOR IPs
+>     This only works if you don't open the ports you are going to protect from docker, since docker gives more privilege to the rules from iptables than the ones generated by this script.
 
-    ´https://github.com/nasatome/block_tor_net_by_iptables´
+    [Block TOR IPs](https://github.com/nasatome/block_tor_net_by_iptables)
+    
+###### Save IpTables
+Now save firewall rules
+    netfilter-persistent save
 
-### Install Docker
+##### Install Docker
 
-> Review Script Docker:
+Review Script Docker:
 
 ´https://get.docker.com/´
 
-> And Exec
+And Exec
 
     curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
-> (for not production mode)   
+ 
+ (for not production mode)   
+   
     curl -fsSL test.docker.com -o get-docker.sh && sh get-docker.sh 
     
-> Can verify
+> Can verify with
     
     docker info
     docker version
@@ -340,23 +377,27 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
 
 #### Install Docker Compose 
 
-> Review last stable release:
-> https://github.com/docker/compose/releases
-> and change the number version in the command:
+> Review last stable release: https://github.com/docker/compose/releases
 
+Get docker-compose version in ENV variable:
+    
     COMPOSE_VERSION=`git ls-remote https://github.com/docker/compose | grep refs/tags | grep -oP "[0-9]+\.[0-9][0-9]+\.[0-9]+$" | tail -n 1`
+
+Install docker-compose    
+    
     curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
     
     
-### Check for rootkits
+###### Check for rootkits
+install 
 
     apt-get install rkhunter chkrootkit
     
-> test
+now test
 
     chkrootkit
     
-> test 2
+now test 2
 
     rkhunter --update
     rkhunter --propupd
@@ -365,7 +406,7 @@ More Info: https://www.certdepot.net/rhel7-get-started-firewalld/
     
     
     
-> todo:
+>todo:
 
 * add to cron: check rootkits with mail
 * Tiger and Tripwire
