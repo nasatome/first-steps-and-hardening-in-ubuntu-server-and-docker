@@ -424,7 +424,7 @@ install
     crontab -l > crontab.bak
     cat<<EOF> /etc/cron.daily/rkhunter.sh
     #!/bin/sh(/usr/local/bin/rkhunter --versioncheck/usr/local/bin/rkhunter --update/usr/local/bin/rkhunter --cronjob --report-warnings-only)
-    /bin/mail -s 'rkhunter Daily Run ($HOSTNAME)' $MYMAIL
+    /bin/mail -s 'rkhunter Daily Run ($HOSTNAME)' $MY_EMAIL
     EOF
     chmod 700 /etc/cron.daily/rkhunter.sh
     
