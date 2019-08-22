@@ -418,6 +418,17 @@ install
 
     apt-get install rkhunter chkrootkit
     
+
+###### Add mail on rootkiits on crontab
+
+    crontab -l > crontab.bak
+    cat<<EOF> /etc/cron.daily/rkhunter.sh
+    #!/bin/sh(/usr/local/bin/rkhunter --versioncheck/usr/local/bin/rkhunter --update/usr/local/bin/rkhunter --cronjob --report-warnings-only)
+    /bin/mail -s 'rkhunter Daily Run ($HOSTNAME)' $MYMAIL
+    EOF
+    chmod 700 /etc/cron.daily/rkhunter.sh
+    
+
 now test
 
     chkrootkit
@@ -427,12 +438,14 @@ now test 2
     rkhunter --update
     rkhunter --propupd
     rkhunter --check
+    rkhunter -c -sk
+    
     
     
     
     
 >todo:
 
-* add to cron: check rootkits with mail
+* add to cron: check rootkits with mail - DONE !?
 * Tiger and Tripwire
 * https://www.digitalocean.com/community/questions/best-practices-for-hardening-new-sever-in-2017
