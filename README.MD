@@ -416,8 +416,18 @@ Install docker-compose
 ###### Check for rootkits
 install 
 
-    apt-get install rkhunter chkrootkit
+    apt-get install chkrootkit
     
+
+###### Install RKhunter by source
+    
+    read -P "What is RKHunter Download Link? ( example: 1.4.6 )" RKPKG
+    RKLNK="https://sourceforge.net/projects/rkhunter/files/rkhunter/$RKPKG/rkhunter-$RKPKG.tar.gz/download"
+    wget -P /usr/local/src $RKLNK
+    tar -zxvf rkhunter-$RKPKG.tar.gz --directory /usr/local/src
+    cd rkhunter-$RKPKG.tar.gz 
+    ./installer.sh --layout default --install /usr/local/bin/rkhunter --update /usr/local/bin/rkhunter --propupd
+    rm -rf /usr/local/src/rkhunter*
 
 ###### Add mail on rootkiits on crontab
 
