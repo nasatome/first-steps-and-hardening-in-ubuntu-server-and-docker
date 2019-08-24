@@ -151,7 +151,7 @@ And... once connected with your user test that you can upgrade your privileges t
     && sed -i 's/Port 22/Port '$MY_SERVER_SSH_PORT'/' /etc/ssh/sshd_config \
     && sed -i 's/#Port '$MY_SERVER_SSH_PORT'/Port '$MY_SERVER_SSH_PORT'/' /etc/ssh/sshd_config \
     && sed -i 's/X11Forwarding yes/X11Forwarding no/' /etc/ssh/sshd_config \
-    && sed -i 's/AcceptEnv LANG LC_*/AcceptEnv LANG LC_* GIT_*/' /etc/ssh/sshd_config \
+    && sed -i 's/AcceptEnv LANG LC_*/AcceptEnv LANG LC_* GIT_/' /etc/ssh/sshd_config \
     && sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
     && sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config \
     && sed -zi 's/DebianBanner yes\|$/DebianBanner no\n/' /etc/ssh/sshd_config \
@@ -257,7 +257,7 @@ Install ufw
  
 Install iptables-persistent
 
-    apt-get install iptables-persistent 
+    apt-get install -y iptables-persistent 
 
 Enable Logs of iptables   
 
@@ -375,6 +375,7 @@ Now you can restart the service with any of these commands
     
 ###### Save IpTables
 Now save firewall rules
+
     netfilter-persistent save
 
 ##### Install Docker
