@@ -362,9 +362,11 @@ And Check
     service rsyslog restart
 
 In the following command, all outputs with a + sign must appear
+
     psad --fw-analyze
 
 Now you can restart the service with any of these commands
+
     psad -H
     psad -R   
     
