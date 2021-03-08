@@ -25,8 +25,9 @@ First of all configure your timezone and your encodings, this command will also 
 ###### Install BashIt (Only if you do not use zsh or some similar console)
 
     git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it && ~/.bash_it/install.sh \
-    && mkdir -p ~/.bash_it/plugins/enabled/ \
-    && ln -s ~/.bash_it/plugins/available/history.plugin.bash ~/.bash_it/plugins/enabled/250---history.plugin.bash \
+    && ln -s ~/.bash_it/plugins/available/history.plugin.bash ~/.bash_it/enabled/250---history.plugin.bash \
+    && ln -s ~/.bash_it/plugins/available/history-search.plugin.bash ~/.bash_it/enabled/250---history-search.plugin.bash \
+    && ln -s ~/.bash_it/plugins/available/history-substring-search.plugin.bash ~/.bash_it/enabled/250---history-substring-search.plugin.bash \
     && sed -i 's/bobby/sexy/' ~/.bashrc
     
 > You can change the last line "sexy" by any of the available themes, exit the console and re-enter to apply https://github.com/Bash-it/bash-it/tree/master/themes
