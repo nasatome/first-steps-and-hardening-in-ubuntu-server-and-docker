@@ -420,8 +420,29 @@ Install docker-compose
 ###### Check for rootkits
 install 
 
-    apt-get install rkhunter chkrootkit
+    apt-get install chkrootkit
     
+
+###### Install RKhunter by source
+    
+    read -P "What is RKHunter Download Link? ( example: 1.4.6 )" RKPKG
+    RKLNK="https://sourceforge.net/projects/rkhunter/files/rkhunter/$RKPKG/rkhunter-$RKPKG.tar.gz/download"
+    wget -P /usr/local/src $RKLNK
+    tar -zxvf rkhunter-$RKPKG.tar.gz --directory /usr/local/src
+    cd rkhunter-$RKPKG.tar.gz 
+    ./installer.sh --layout default --install /usr/local/bin/rkhunter --update /usr/local/bin/rkhunter --propupd
+    rm -rf /usr/local/src/rkhunter*
+
+###### Add mail on rootkiits on crontab
+
+    crontab -l > crontab.bak
+    cat<<EOF> /etc/cron.daily/rkhunter.sh
+    #!/bin/sh(/usr/local/bin/rkhunter --versioncheck/usr/local/bin/rkhunter --update/usr/local/bin/rkhunter --cronjob --report-warnings-only)
+    /bin/mail -s 'rkhunter Daily Run ($HOSTNAME)' $MY_EMAIL
+    EOF
+    chmod 700 /etc/cron.daily/rkhunter.sh
+    
+
 now test
 
     chkrootkit
@@ -431,12 +452,14 @@ now test 2
     rkhunter --update
     rkhunter --propupd
     rkhunter --check
+    rkhunter -c -sk
+    
     
     
     
     
 >todo:
 
-* add to cron: check rootkits with mail
+* add to cron: check rootkits with mail - DONE !?
 * Tiger and Tripwire
 * https://www.digitalocean.com/community/questions/best-practices-for-hardening-new-sever-in-2017
